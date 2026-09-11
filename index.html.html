@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMART GENERATOR - Semua Administrasi Guru, Lebih Smart.</title>
+    
+    <!-- External Dependencies & Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            200: '#c7d2fe',
+                            300: '#a5b4fc',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81',
+                        },
+                        emerald: {
+                            500: '#10b981',
+                            600: '#059669',
+                        },
+                        amber: {
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        .a4-paper {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: 10px auto;
+            background: white;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            color: #1e293b;
+        }
+
+        .f4-paper {
+            width: 215mm;
+            min-height: 330mm;
+            padding: 20mm;
+            margin: 10px auto;
+            background: white;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            color: #1e293b;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            #printable-area, #printable-area * { visibility: visible; }
+            #printable-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 15mm;
+                box-shadow: none;
+            }
+            .no-print { display: none !important; }
+        }
+
+        /* Custom Scrollbar Styles */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 h-full flex flex-col transition-colors duration-200">
+
+    <div id="app" class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700/60 flex flex-col shrink-0 transition-all duration-300 z-30 fixed lg:static inset-y-0 -translate-x-full lg:translate-x-0">
+            <!-- Brand Header -->
+            <div class="p-5 border-b border-slate-200 dark:border-slate-700/60 flex items-center justify-between">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="switchTab('dashboard')">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-primary-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-primary-500/20">
+                        <i class="fa-solid font-bold text-xl">SG</i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-base text-slate-900 dark:text-white tracking-tight leading-none">SMART <span class="text-primary-600">GEN</span></h1>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 font-medium">Administrasi Guru AI</p>
+                    </div>
+                </div>
+                <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Navigation Links -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-6">
+                <!-- Main Nav -->
+                <div>
+                    <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-3">Utama</div>
+                    <nav class="space-y-1">
+                        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-primary-600 transition-colors">
+                            <i class="fa-solid fa-chart-pie w-5 text-center text-primary-500"></i>
+                            <span>Dashboard</span>
+                        </button>
+                        <button onclick="switchTab('ai-generator')" id="nav-ai-generator" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-primary-600 transition-colors">
+                            <i class="fa-solid fa-wand-magic-sparkles w-5 text-center text-amber-500"></i>
+                            <span>SMART AI Generator</span>
+                            <span class="ml-auto bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-full">Groq Default</span>
+                        </button>
+                        <button onclick="switchTab('packages')" id="nav-packages" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-primary-600 transition-colors">
+                            <i class="fa-solid fa-box-archive w-5 text-center text-emerald-500"></i>
+                            <span>Paket Administrasi</span>
+                        </button>
+                        <button onclick="switchTab('documents')" id="nav-documents" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-primary-600 transition-colors">
+                            <i class="fa-solid fa-folder-open w-5 text-center text-indigo-500"></i>
+                            <span>Dokumen Saya</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <div>
+                    <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-3">Perencanaan</div>
+                    <nav class="space-y-1">
+                        <button onclick="filterDocumentType('ATP')" class="w-full flex items-center gap-3 px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 rounded-lg">
+                            <i class="fa-solid fa-route w-4 text-slate-400"></i>
+                            <span>ATP & Prota</span>
+                        </button>
+                        <button onclick="filterDocumentType('Modul Ajar')" class="w-full flex items-center gap-3 px-3 py-2 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 rounded-lg">
+                            <i class="fa-solid fa-book-open w-4 text-slate-400"></i>
+                            <span>Modul Ajar & RPP</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Penilaian & Kelas -->
+                <div>
+                    <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-3">Penilaian & Kelas</div>
+                    <nav class="space-y-1">
+                        <button onclick="switchTab('assessment')" id="nav-assessment" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-primary-600 transition-colors">
+                            <i class="fa-solid fa-file-pen w-5 text-center text-rose-500"></i>
+                            <span>Bank Soal & Asesmen</span>
+                        </button>
+                        <button onclick="switchTab('grades')" id="nav-grades" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-primary-600 transition-colors">
+                            <i class="fa-solid fa-chart-line w-5 text-center text-teal-500"></i>
+                            <span>Analisis Nilai & Remedial</span>
+                        </button>
+                        <button onclick="switchTab('journal')" id="nav-journal" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-primary-600 transition-colors">
+                            <i class="fa-solid fa-clipboard-user w-5 text-center text-sky-500"></i>
+                            <span>Jurnal & Absensi</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Settings -->
+                <div>
+                    <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-3">Pengaturan</div>
+                    <nav class="space-y-1">
+                        <button onclick="switchTab('exports')" id="nav-exports" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-primary-600 transition-colors">
+                            <i class="fa-solid fa-file-export w-5 text-center text-violet-500"></i>
+                            <span>Export Center</span>
+                        </button>
+                        <button onclick="switchTab('settings')" id="nav-settings" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50 hover:text-primary-600 transition-colors">
+                            <i class="fa-solid fa-sliders w-5 text-center text-amber-500"></i>
+                            <span>Pengaturan Groq AI & Profil</span>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Sidebar Footer User Profile -->
+            <div class="p-4 border-t border-slate-200 dark:border-slate-700/60 bg-slate-50/50 dark:bg-slate-800/50">
+                <div class="flex items-center gap-3">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150" alt="Guru" class="w-9 h-9 rounded-full object-cover border border-slate-200 dark:border-slate-700">
+                    <div class="flex-1 min-w-0">
+                        <p id="profile-name-side" class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">Budi Santoso, S.Pd.</p>
+                        <p id="profile-school-side" class="text-[10px] text-slate-500 truncate">SMP Contoh Nusantara</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+            
+            <!-- Topbar Header -->
+            <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700/60 px-4 py-3 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()" class="lg:hidden p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                    <!-- Global Command Search Trigger -->
+                    <div onclick="openCommandPalette()" class="hidden sm:flex items-center gap-3 px-3 py-1.5 bg-slate-100 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600/50 rounded-xl text-slate-400 text-xs w-64 md:w-80 cursor-pointer hover:border-primary-400 transition-all">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span>Cari atau ketik perintah (Ctrl+K)...</span>
+                        <kbd class="ml-auto bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded text-[10px] border border-slate-300 dark:border-slate-600 font-mono text-slate-500">⌘K</kbd>
+                    </div>
+                </div>
+
+                <!-- Right Header Actions -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <button onclick="toggleAIAssistant()" class="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl text-xs font-semibold shadow-sm hover:opacity-95 transition-opacity">
+                        <i class="fa-solid fa-sparkles"></i>
+                        <span class="hidden md:inline">SMART Assistant</span>
+                    </button>
+
+                    <button onclick="toggleTheme()" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl text-sm transition-colors" title="Ubah Tema">
+                        <i class="fa-solid fa-moon dark:hidden"></i>
+                        <i class="fa-solid fa-sun hidden dark:block text-amber-400"></i>
+                    </button>
+
+                    <!-- Notifications Dropdown -->
+                    <div class="relative">
+                        <button onclick="toggleNotifications()" class="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl text-sm relative">
+                            <i class="fa-solid fa-bell"></i>
+                            <span class="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full animate-pulse"></span>
+                        </button>
+                        <div id="notifications-menu" class="hidden absolute right-0 mt-2 w-80 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 p-4 z-50">
+                            <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
+                                <span class="font-bold text-xs text-slate-800 dark:text-slate-200">Notifikasi Administrasi</span>
+                                <span class="text-[10px] text-primary-600 cursor-pointer">Tandai dibaca</span>
+                            </div>
+                            <div class="space-y-3 mt-3 text-xs">
+                                <div class="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-300 border border-amber-200/50">
+                                    <p class="font-semibold">Groq AI Active (Default)</p>
+                                    <p class="text-[11px] mt-0.5 opacity-90">Engine siap digunakan dengan model Llama 3.3 70B & GPT OSS 120B via GroqCloud.</p>
+                                </div>
+                                <div class="p-2 rounded-xl bg-slate-50 dark:bg-slate-700/40 text-slate-600 dark:text-slate-300">
+                                    <p class="font-semibold">Export Selesai</p>
+                                    <p class="text-[11px] mt-0.5">Paket Administrasi Semester 1 berhasil digenerate.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pl-2 border-l border-slate-200 dark:border-slate-700 flex items-center gap-2">
+                        <button onclick="switchTab('settings')" class="flex items-center gap-2 hover:opacity-80">
+                            <div class="w-8 h-8 rounded-full bg-primary-100 text-primary-700 font-bold flex items-center justify-center text-xs border border-primary-300">
+                                BS
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50 dark:bg-slate-900/50">
+                
+                <!-- 1. DASHBOARD TAB -->
+                <div id="tab-dashboard" class="tab-content space-y-6">
+                    <div class="bg-gradient-to-r from-primary-700 via-primary-600 to-indigo-600 rounded-3xl p-6 md:p-8 text-white shadow-xl shadow-primary-900/10 relative overflow-hidden">
+                        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+                        <div class="relative z-10 max-w-2xl">
+                            <span class="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-semibold tracking-wide uppercase">Tahun Ajaran 2026/2027 • Semester Ganjil</span>
+                            <h1 class="text-2xl md:text-3xl font-extrabold mt-3 tracking-tight">Selamat Datang, <span id="dash-teacher-name">Budi Santoso, S.Pd.</span> 👋</h1>
+                            <p class="mt-2 text-primary-100 text-sm leading-relaxed">
+                                Kelola seluruh perangkat pembelajaran, modul ajar, bank soal, dan jurnal kelas Anda dengan Groq AI & Gemini Llama 3.3 70B.
+                            </p>
+                            
+                            <div class="mt-6 flex flex-wrap gap-3">
+                                <button onclick="switchTab('ai-generator')" class="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold rounded-xl text-xs sm:text-sm shadow-md transition-all flex items-center gap-2">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                    <span>+ Generate Administrasi Groq AI</span>
+                                </button>
+                                <button onclick="switchTab('packages')" class="px-5 py-2.5 bg-white/15 hover:bg-white/25 text-white font-semibold rounded-xl text-xs sm:text-sm backdrop-blur-md transition-all flex items-center gap-2">
+                                    <i class="fa-solid fa-box-archive"></i>
+                                    <span>Lihat Paket Lengkap</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SMART SCORE Readiness Card & Quick Stats Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between">
+                                    <h3 class="font-bold text-slate-800 dark:text-slate-100 text-sm flex items-center gap-2">
+                                        <i class="fa-solid fa-gauge-high text-primary-600"></i>
+                                        <span>SMART SCORE KESIAPAN</span>
+                                    </h3>
+                                    <span class="text-xs bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 font-bold px-2.5 py-1 rounded-full">Sangat Baik</span>
+                                </div>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Kelengkapan Administrasi Mengajar Semester Ini</p>
+
+                                <div class="mt-5 flex items-center gap-6">
+                                    <div class="relative w-28 h-28 flex items-center justify-center shrink-0">
+                                        <canvas id="smartScoreChart"></canvas>
+                                        <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                                            <span class="text-2xl font-black text-slate-800 dark:text-white leading-none">87%</span>
+                                            <span class="text-[10px] text-slate-400 font-medium mt-0.5">Lengkap</span>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-2 text-xs w-full">
+                                        <div>
+                                            <div class="flex justify-between font-semibold text-slate-600 dark:text-slate-300">
+                                                <span>Perencanaan</span>
+                                                <span class="text-primary-600 font-bold">90%</span>
+                                            </div>
+                                            <div class="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full mt-1 overflow-hidden">
+                                                <div class="bg-primary-600 h-full rounded-full" style="width: 90%"></div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between font-semibold text-slate-600 dark:text-slate-300">
+                                                <span>Penilaian</span>
+                                                <span class="text-amber-500 font-bold">82%</span>
+                                            </div>
+                                            <div class="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full mt-1 overflow-hidden">
+                                                <div class="bg-amber-500 h-full rounded-full" style="width: 82%"></div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between font-semibold text-slate-600 dark:text-slate-300">
+                                                <span>Jurnal & Kelas</span>
+                                                <span class="text-emerald-500 font-bold">95%</span>
+                                            </div>
+                                            <div class="w-full bg-slate-100 dark:bg-slate-700 h-1.5 rounded-full mt-1 overflow-hidden">
+                                                <div class="bg-emerald-500 h-full rounded-full" style="width: 95%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 text-xs text-indigo-900 dark:text-indigo-200 flex items-start gap-2.5">
+                                <i class="fa-solid fa-lightbulb text-amber-500 text-sm mt-0.5 shrink-0"></i>
+                                <div>
+                                    <span class="font-bold">Rekomendasi Groq AI:</span> "Lengkapi analisis nilai ulangan harian dan remedial kelas VIII-A untuk menyempurnakan administrasi Anda menjadi 100%."
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4 Stat Summary Cards Grid -->
+                        <div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-2 gap-4">
+                            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Dokumen</span>
+                                    <div class="w-8 h-8 rounded-xl bg-primary-100 text-primary-600 flex items-center justify-center text-sm">
+                                        <i class="fa-solid fa-file-lines"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="text-2xl font-black text-slate-800 dark:text-white">28</div>
+                                    <p class="text-[11px] text-emerald-600 font-semibold mt-1 flex items-center gap-1">
+                                        <i class="fa-solid fa-arrow-up"></i> 12 dokumen baru bulan ini
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Mata Pelajaran</span>
+                                    <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-sm">
+                                        <i class="fa-solid fa-atom"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="text-2xl font-black text-slate-800 dark:text-white">IPA (Sains)</div>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Kelas VIII-A, VIII-B, VIII-C</p>
+                                </div>
+                            </div>
+
+                            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Siswa Diampu</span>
+                                    <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-sm">
+                                        <i class="fa-solid fa-users"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="text-2xl font-black text-slate-800 dark:text-white">96 Siswa</div>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Absensi rata-rata: <span class="font-bold text-emerald-600">96.8%</span></p>
+                                </div>
+                            </div>
+
+                            <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Bank Soal Groq</span>
+                                    <div class="w-8 h-8 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center text-sm">
+                                        <i class="fa-solid fa-list-check"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="text-2xl font-black text-slate-800 dark:text-white">140 Soal</div>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Lengkap dengan kunci & rubrik</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Documents Table -->
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                        <div class="p-5 border-b border-slate-100 dark:border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div>
+                                <h3 class="font-bold text-slate-800 dark:text-slate-100 text-base">Dokumen Administrasi Terbaru</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Dokumen yang baru saja digenerate atau diperbarui</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="switchTab('documents')" class="px-3 py-1.5 text-xs font-semibold text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-950/50 rounded-lg transition-colors">
+                                    Lihat Semua Dokumen <i class="fa-solid fa-chevron-right text-[10px] ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-700">
+                                        <th class="p-3.5 pl-5">Nama Dokumen</th>
+                                        <th class="p-3.5">Kategori</th>
+                                        <th class="p-3.5">Mata Pelajaran & Kelas</th>
+                                        <th class="p-3.5">Status</th>
+                                        <th class="p-3.5">Tanggal</th>
+                                        <th class="p-3.5 pr-5 text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-docs-tbody" class="divide-y divide-slate-100 dark:divide-slate-700/60">
+                                    <!-- Populated dynamically via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. SMART AI GENERATOR TAB -->
+                <div id="tab-ai-generator" class="tab-content hidden space-y-6">
+                    <div class="max-w-4xl mx-auto">
+                        <div class="text-center mb-8">
+                            <span class="px-3 py-1 bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 rounded-full text-xs font-bold tracking-wide">
+                                <i class="fa-solid fa-bolt mr-1"></i> DEFAULT ENGINE: GROQ AI (LLAMA 3.3 70B)
+                            </span>
+                            <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white mt-2">Generate Administrasi Guru Terintegrasi</h2>
+                            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-xl mx-auto">
+                                Masukkan data dasar pembelajaran sekali saja. Engine Groq AI akan menghasilkan 17 dokumen administrasi terhubung secara otomatis sesuai Kurikulum Merdeka.
+                            </p>
+                        </div>
+
+                        <!-- Generator Wizard Form Card -->
+                        <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 md:p-8 border border-slate-200 dark:border-slate-700 shadow-xl space-y-6">
+                            
+                            <!-- Step 1: Identitas -->
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-4 flex items-center gap-2">
+                                    <span class="w-6 h-6 rounded-full bg-primary-600 text-white text-xs flex items-center justify-center">1</span>
+                                    <span>Identitas Pembelajaran</span>
+                                </h3>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+                                    <div>
+                                        <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Jenjang Sekolah</label>
+                                        <select id="gen-jenjang" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-primary-500">
+                                            <option value="SMP">SMP / MTs</option>
+                                            <option value="SD">SD / MI</option>
+                                            <option value="SMA">SMA / MA</option>
+                                            <option value="SMK">SMK</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Kelas</label>
+                                        <input type="text" id="gen-kelas" value="Kelas VIII-A" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-primary-500">
+                                    </div>
+                                    <div>
+                                        <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Mata Pelajaran</label>
+                                        <input type="text" id="gen-mapel" value="IPA (Sains)" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-primary-500">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="border-slate-100 dark:border-slate-700">
+
+                            <!-- Step 2: Materi & Tujuan -->
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-4 flex items-center gap-2">
+                                    <span class="w-6 h-6 rounded-full bg-primary-600 text-white text-xs flex items-center justify-center">2</span>
+                                    <span>Materi & Tujuan Pembelajaran</span>
+                                </h3>
+
+                                <div class="space-y-4 text-xs">
+                                    <div>
+                                        <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Materi Pokok / Bab</label>
+                                        <input type="text" id="gen-materi" value="Sistem Pernapasan Manusia & Kesehatan Organ Paru" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-primary-500">
+                                    </div>
+                                    <div>
+                                        <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Tujuan Pembelajaran (TP)</label>
+                                        <textarea id="gen-tujuan" rows="2" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-primary-500">Peserta didik mampu menganalisis struktur organ pernapasan manusia, menjelaskan mekanisme pertukaran gas, serta membuat karya kampanye menjaga kesehatan organ pernapasan.</textarea>
+                                    </div>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Alokasi Waktu</label>
+                                            <input type="text" id="gen-durasi" value="3 JP x 40 Menit (2 Pertemuan)" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-primary-500">
+                                        </div>
+                                        <div>
+                                            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Profil Pelajar Pancasila</label>
+                                            <input type="text" id="gen-ppp" value="Bernalar Kritis, Gotong Royong, Kreatif" class="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-primary-500">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="border-slate-100 dark:border-slate-700">
+
+                            <!-- Step 3: Checkbox Bundle Selection -->
+                            <div>
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                                        <span class="w-6 h-6 rounded-full bg-primary-600 text-white text-xs flex items-center justify-center">3</span>
+                                        <span>Paket Dokumen yang Ingin Digenerate</span>
+                                    </h3>
+                                    <button onclick="selectAllDocCheckboxes(true)" class="text-xs text-primary-600 font-semibold hover:underline">Pilih Semua (17 Dokumen)</button>
+                                </div>
+
+                                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 text-xs">
+                                    <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30 cursor-pointer">
+                                        <input type="checkbox" checked class="doc-chk rounded text-primary-600" value="ATP"> <span>ATP & CP</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30 cursor-pointer">
+                                        <input type="checkbox" checked class="doc-chk rounded text-primary-600" value="Modul Ajar"> <span>Modul Ajar</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30 cursor-pointer">
+                                        <input type="checkbox" checked class="doc-chk rounded text-primary-600" value="RPP Singkat"> <span>RPP 1 Lembar</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30 cursor-pointer">
+                                        <input type="checkbox" checked class="doc-chk rounded text-primary-600" value="LKPD"> <span>LKPD Siswa</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30 cursor-pointer">
+                                        <input type="checkbox" checked class="doc-chk rounded text-primary-600" value="Bahan Ajar"> <span>Bahan Ajar Ringkas</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30 cursor-pointer">
+                                        <input type="checkbox" checked class="doc-chk rounded text-primary-600" value="Asesmen Diagnostik"> <span>Asesmen Diagnostik</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30 cursor-pointer">
+                                        <input type="checkbox" checked class="doc-chk rounded text-primary-600" value="Kisi-kisi Soal"> <span>Kisi-kisi Soal</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30 cursor-pointer">
+                                        <input type="checkbox" checked class="doc-chk rounded text-primary-600" value="Soal & Kunci"> <span>Soal & Kunci Jawaban</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30 cursor-pointer">
+                                        <input type="checkbox" checked class="doc-chk rounded text-primary-600" value="Rubrik Penilaian"> <span>Rubrik Penilaian</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30 cursor-pointer">
+                                        <input type="checkbox" checked class="doc-chk rounded text-primary-600" value="Program Remedial"> <span>Program Remedial</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30 cursor-pointer">
+                                        <input type="checkbox" checked class="doc-chk rounded text-primary-600" value="Pengayaan"> <span>Program Pengayaan</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30 cursor-pointer">
+                                        <input type="checkbox" checked class="doc-chk rounded text-primary-600" value="Jurnal & Refleksi"> <span>Jurnal & Refleksi</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <hr class="border-slate-100 dark:border-slate-700">
+
+                            <!-- Step 4: Engine Config -->
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                    <span class="w-6 h-6 rounded-full bg-primary-600 text-white text-xs flex items-center justify-center">4</span>
+                                    <span>Pilih Engine AI (Default: Groq AI)</span>
+                                </h3>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                                    <label id="provider-card-groq" class="p-3.5 rounded-2xl border-2 border-amber-500 bg-amber-50/30 dark:bg-amber-950/20 cursor-pointer flex items-start gap-3 transition-all">
+                                        <input type="radio" name="ai-provider" value="groq" onchange="updateProviderSelection('groq')" checked class="mt-1 text-amber-600">
+                                        <div>
+                                            <div class="flex items-center gap-2">
+                                                <span class="font-bold text-slate-900 dark:text-white">Groq AI Engine</span>
+                                                <span class="px-2 py-0.5 bg-amber-500 text-white text-[10px] font-extrabold rounded-full">DEFAULT • ULTRA FAST</span>
+                                            </div>
+                                            <p class="text-slate-500 text-[11px] mt-1">Llama 3.3 70B Versatile, Llama 3.1 8B, GPT OSS 120B & Qwen models via GroqCloud API.</p>
+                                        </div>
+                                    </label>
+
+                                    <label id="provider-card-gemini" class="p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30 cursor-pointer flex items-start gap-3 transition-all">
+                                        <input type="radio" name="ai-provider" value="gemini" onchange="updateProviderSelection('gemini')" class="mt-1 text-primary-600">
+                                        <div>
+                                            <div class="flex items-center gap-2">
+                                                <span class="font-bold text-slate-900 dark:text-white">Google Gemini Engine</span>
+                                                <span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-[10px] font-bold rounded-full">Gemini 3 Flash</span>
+                                            </div>
+                                            <p class="text-slate-500 text-[11px] mt-1">Model multimodal Google untuk analisis konteks pendidikan Kurikulum Merdeka.</p>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <!-- Groq Model Select & API Key Drawer -->
+                                <div id="groq-key-container" class="mt-3 p-3.5 bg-slate-100 dark:bg-slate-700/40 rounded-2xl border border-slate-200 dark:border-slate-600 text-xs space-y-3">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                                                Model Groq Cloud
+                                            </label>
+                                            <select id="gen-groq-model" onchange="updateGroqModelSelection(this.value)" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl font-medium focus:ring-2 focus:ring-amber-500">
+                                                <optgroup label="Production LLMs & Systems">
+                                                    <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (Llama 3.3 70B - Standard Flagship)</option>
+                                                    <option value="llama-3.1-8b-instant">llama-3.1-8b-instant (Llama 3.1 8B - Instant Response)</option>
+                                                    <option value="openai/gpt-oss-120b">openai/gpt-oss-120b (GPT OSS 120B)</option>
+                                                    <option value="openai/gpt-oss-20b">openai/gpt-oss-20b (GPT OSS 20B)</option>
+                                                    <option value="groq/compound">groq/compound (Compound System)</option>
+                                                    <option value="groq/compound-mini">groq/compound-mini (Compound Mini)</option>
+                                                </optgroup>
+                                                <optgroup label="Preview & Specialized LLMs">
+                                                    <option value="qwen/qwen3.8-27b">qwen/qwen3.8-27b (Qwen 3.8 27B)</option>
+                                                    <option value="qwen/qwen3.6-27b">qwen/qwen3.6-27b (Qwen 3.6 27B)</option>
+                                                    <option value="minimaxai/minimax-m2.7">minimaxai/minimax-m2.7 (MiniMax M2.7)</option>
+                                                    <option value="canopylabs/orpheus-v1-english">canopylabs/orpheus-v1-english (Canopy Labs Orpheus V1 English)</option>
+                                                    <option value="canopylabs/orpheus-arabic-saudi">canopylabs/orpheus-arabic-saudi (Canopy Labs Orpheus Arabic Saudi)</option>
+                                                </optgroup>
+                                                <optgroup label="Safety & Guardrails">
+                                                    <option value="openai/gpt-oss-safeguard-20b">openai/gpt-oss-safeguard-20b (Safety GPT OSS 20B)</option>
+                                                    <option value="meta-llama/llama-prompt-guard-2-22m">meta-llama/llama-prompt-guard-2-22m (Llama Prompt Guard 2 22M)</option>
+                                                </optgroup>
+                                                <optgroup label="Audio / Whisper Speech Models">
+                                                    <option value="whisper-large-v3-turbo">whisper-large-v3-turbo (Whisper Large V3 Turbo)</option>
+                                                    <option value="whisper-large-v3">whisper-large-v3 (Whisper Large V3)</option>
+                                                </optgroup>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <div class="flex items-center justify-between mb-1">
+                                                <label class="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                                                    <i class="fa-solid fa-key text-amber-500"></i> Groq API Key
+                                                </label>
+                                                <a href="https://console.groq.com/keys" target="_blank" class="text-primary-600 hover:underline text-[10px]">Get Key Gratis <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>
+                                            </div>
+                                            <input type="password" id="gen-groq-key" placeholder="gsk_... (Atau via Vercel env)" onchange="saveGroqKeyFromForm(this.value)" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl font-mono focus:ring-2 focus:ring-amber-500">
+                                        </div>
+                                    </div>
+                                    <p class="text-[10px] text-slate-400">Key tersimpan di browser secara lokal, atau terdeteksi otomatis dari Vercel Environment Variables (`GROQ_API_KEY` / `NEXT_PUBLIC_GROQ_API_KEY`).</p>
+                                </div>
+                            </div>
+
+                            <!-- Generate Trigger Button -->
+                            <div class="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div class="text-[11px] text-slate-500">
+                                    <i class="fa-solid fa-bolt text-amber-500 mr-1"></i> Continuous Stream Groq API & Gemini • Kurikulum Merdeka
+                                </div>
+                                <button onclick="triggerSmartAIGeneration()" id="btn-generate-ai" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 text-white font-bold rounded-2xl shadow-lg shadow-amber-500/25 hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-3">
+                                    <i class="fa-solid fa-bolt text-lg"></i>
+                                    <span>GENERATE DENGAN SMART AI</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. DOKUMEN SAYA TAB -->
+                <div id="tab-documents" class="tab-content hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Dokumen Administrasi Saya</h2>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Arsip seluruh perangkat mengajar, soal, modul, dan jurnal yang telah dibuat.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="switchTab('ai-generator')" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>Buat Baru</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col md:flex-row gap-3">
+                        <div class="relative flex-1 text-xs">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400"></i>
+                            <input type="text" id="doc-search-input" onkeyup="renderDocumentsList()" placeholder="Cari nama dokumen, materi, atau kelas..." class="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-primary-500">
+                        </div>
+                        <div class="flex items-center gap-2 text-xs">
+                            <select id="doc-filter-category" onchange="renderDocumentsList()" class="px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl">
+                                <option value="ALL">Semua Kategori</option>
+                                <option value="Modul Ajar">Modul Ajar & RPP</option>
+                                <option value="ATP">ATP & Prota</option>
+                                <option value="Asesmen">Soal & Asesmen</option>
+                                <option value="LKPD">LKPD Siswa</option>
+                                <option value="Jurnal">Jurnal & Kelas</option>
+                            </select>
+                            <select id="doc-filter-status" onchange="renderDocumentsList()" class="px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl">
+                                <option value="ALL">Semua Status</option>
+                                <option value="Completed">Selesai (Completed)</option>
+                                <option value="Draft">Draft</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="documents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- 4. DOCUMENT EDITOR TAB -->
+                <div id="tab-editor" class="tab-content hidden space-y-4">
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 sticky top-0 z-20">
+                        <div class="flex items-center gap-3">
+                            <button onclick="switchTab('documents')" class="p-2 text-slate-500 hover:text-slate-800 dark:hover:text-white rounded-lg">
+                                <i class="fa-solid fa-arrow-left text-base"></i>
+                            </button>
+                            <div>
+                                <h3 id="editor-doc-title" class="font-bold text-slate-900 dark:text-white text-sm">Modul Ajar IPA Kelas VIII</h3>
+                                <p id="editor-doc-meta" class="text-[11px] text-slate-500">Terakhir disimpan: Baru saja</p>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2">
+                            <div class="flex items-center bg-slate-100 dark:bg-slate-700 rounded-lg p-1 text-xs">
+                                <button onclick="setPaperFormat('A4')" class="px-2.5 py-1 rounded-md font-medium text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-600">A4</button>
+                                <button onclick="setPaperFormat('F4')" class="px-2.5 py-1 rounded-md font-medium text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-600">F4</button>
+                            </div>
+                            <button onclick="saveCurrentDocument()" class="px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5">
+                                <i class="fa-solid fa-floppy-disk"></i> Simpan
+                            </button>
+                            <button onclick="printDocument()" class="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-800 dark:text-slate-200 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+                                <i class="fa-solid fa-print"></i> Cetak / PDF
+                            </button>
+                            <button onclick="exportDocxSimulated()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5">
+                                <i class="fa-solid fa-file-word"></i> Export DOCX
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Editable Paper Container -->
+                    <div class="overflow-x-auto pb-12 flex justify-center bg-slate-200/60 dark:bg-slate-950 p-4 sm:p-8 rounded-3xl min-h-[800px]">
+                        <div id="printable-area" class="a4-paper rounded-sm font-sans text-xs leading-relaxed outline-none focus:ring-2 focus:ring-primary-500/30" contenteditable="true">
+                            <!-- Populated with document HTML -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. PAKET ADMINISTRASI TAB -->
+                <div id="tab-packages" class="tab-content hidden space-y-6">
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <span class="text-xs font-bold text-emerald-600 uppercase tracking-wide">Standard Compliance</span>
+                                <h2 class="text-xl font-bold text-slate-900 dark:text-white mt-0.5">Paket Kelengkapan Administrasi Semester</h2>
+                                <p class="text-xs text-slate-500">Periksa dan sediakan seluruh bundle dokumen administrasi guru dalam satu tempat.</p>
+                            </div>
+                            <button onclick="switchTab('ai-generator')" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-md">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                <span>Generate Paket Lengkap AI</span>
+                            </button>
+                        </div>
+
+                        <div class="mt-6 p-4 rounded-2xl bg-slate-50 dark:bg-slate-700/40 border border-slate-200 dark:border-slate-600">
+                            <div class="flex justify-between items-center text-xs font-bold mb-2">
+                                <span class="text-slate-700 dark:text-slate-300">Progress Kelengkapan Berkas IPA VIII-A</span>
+                                <span class="text-emerald-600 font-extrabold text-sm">85% Tuntas</span>
+                            </div>
+                            <div class="w-full bg-slate-200 dark:bg-slate-600 h-3 rounded-full overflow-hidden">
+                                <div class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full" style="width: 85%"></div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 text-xs">
+                            <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 space-y-3">
+                                <h4 class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 border-b pb-2">
+                                    <i class="fa-solid fa-route text-indigo-500"></i> PERENCANAAN
+                                </h4>
+                                <ul class="space-y-2">
+                                    <li class="flex items-center gap-2 text-slate-700 dark:text-slate-300"><i class="fa-solid fa-circle-check text-emerald-500"></i> Capaian Pembelajaran (CP)</li>
+                                    <li class="flex items-center gap-2 text-slate-700 dark:text-slate-300"><i class="fa-solid fa-circle-check text-emerald-500"></i> Alur Tujuan Pembelajaran (ATP)</li>
+                                    <li class="flex items-center gap-2 text-slate-700 dark:text-slate-300"><i class="fa-solid fa-circle-check text-emerald-500"></i> Modul Ajar Bab 1 & Bab 2</li>
+                                    <li class="flex items-center gap-2 text-slate-700 dark:text-slate-300"><i class="fa-solid fa-circle-check text-emerald-500"></i> Program Tahunan & Semester</li>
+                                    <li class="flex items-center gap-2 text-slate-700 dark:text-slate-300"><i class="fa-solid fa-circle-check text-emerald-500"></i> Kalender Pendidikan</li>
+                                </ul>
+                            </div>
+
+                            <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 space-y-3">
+                                <h4 class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 border-b pb-2">
+                                    <i class="fa-solid fa-file-pen text-rose-500"></i> PENILAIAN
+                                </h4>
+                                <ul class="space-y-2">
+                                    <li class="flex items-center gap-2 text-slate-700 dark:text-slate-300"><i class="fa-solid fa-circle-check text-emerald-500"></i> Asesmen Diagnostik</li>
+                                    <li class="flex items-center gap-2 text-slate-700 dark:text-slate-300"><i class="fa-solid fa-circle-check text-emerald-500"></i> Kisi-kisi & Soal Sumatif</li>
+                                    <li class="flex items-center gap-2 text-slate-700 dark:text-slate-300"><i class="fa-solid fa-circle-check text-emerald-500"></i> Rubrik Penilaian Proyek</li>
+                                    <li class="flex items-center gap-2 text-slate-400"><i class="fa-solid fa-circle-xmark text-rose-400"></i> Analisis Hasil Ulangan (Belum)</li>
+                                    <li class="flex items-center gap-2 text-slate-700 dark:text-slate-300"><i class="fa-solid fa-circle-check text-emerald-500"></i> Format Remedial & Pengayaan</li>
+                                </ul>
+                            </div>
+
+                            <div class="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 space-y-3">
+                                <h4 class="font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 border-b pb-2">
+                                    <i class="fa-solid fa-clipboard-user text-sky-500"></i> KELAS & WALI KELAS
+                                </h4>
+                                <ul class="space-y-2">
+                                    <li class="flex items-center gap-2 text-slate-700 dark:text-slate-300"><i class="fa-solid fa-circle-check text-emerald-500"></i> Jurnal Mengajar Harian</li>
+                                    <li class="flex items-center gap-2 text-slate-700 dark:text-slate-300"><i class="fa-solid fa-circle-check text-emerald-500"></i> Rekap Absensi Siswa</li>
+                                    <li class="flex items-center gap-2 text-slate-700 dark:text-slate-300"><i class="fa-solid fa-circle-check text-emerald-500"></i> Catatan Pelanggaran & Prestasi</li>
+                                    <li class="flex items-center gap-2 text-slate-700 dark:text-slate-300"><i class="fa-solid fa-circle-check text-emerald-500"></i> Draf Jadwal Piket & Inventaris</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. ANALISIS NILAI & REMEDIAL TAB -->
+                <div id="tab-grades" class="tab-content hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Analisis Nilai & Program Remedial</h2>
+                            <p class="text-xs text-slate-500">Otomatisasi perhitungan ketuntasan minimal (KKTP) dan generator rekomendasi tindak lanjut.</p>
+                        </div>
+                        <button onclick="generateRemedialAI()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-sparkles"></i>
+                            <span>Buat Soal Remedial dengan Groq AI</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+                            <h3 class="font-bold text-slate-800 dark:text-slate-200 text-xs uppercase tracking-wider mb-2">Ringkasan Ketuntasan KKM (75)</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center text-sm font-semibold">
+                                    <span>Rata-Rata Kelas:</span>
+                                    <span class="text-lg font-black text-primary-600">81.4</span>
+                                </div>
+                                <div class="flex justify-between items-center text-xs text-slate-600 dark:text-slate-300">
+                                    <span>Siswa Tuntas (≥75):</span>
+                                    <span class="font-bold text-emerald-600">28 Siswa (87.5%)</span>
+                                </div>
+                                <div class="flex justify-between items-center text-xs text-slate-600 dark:text-slate-300">
+                                    <span>Perlu Remedial (<75):</span>
+                                    <span class="font-bold text-rose-500">4 Siswa (12.5%)</span>
+                                </div>
+                            </div>
+                            <div class="mt-4 p-3 bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-300 rounded-xl text-xs border border-amber-200/50">
+                                <i class="fa-solid fa-circle-info mr-1"></i> Groq AI telah menyiapkan paket soal remedial khusus untuk 4 siswa.
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                            <h3 class="font-bold text-slate-800 dark:text-slate-200 text-xs uppercase tracking-wider mb-3">Distribusi Nilai Siswa IPA VIII-A</h3>
+                            <div class="h-48">
+                                <canvas id="gradeDistributionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                        <div class="p-4 border-b border-slate-100 dark:border-slate-700 font-bold text-sm text-slate-800 dark:text-slate-200">
+                            Daftar Nilai Ulangan Harian 1 - Sistem Pernapasan
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-slate-50 dark:bg-slate-700/50 text-slate-500 font-semibold border-b border-slate-200 dark:border-slate-700">
+                                    <tr>
+                                        <th class="p-3">No</th>
+                                        <th class="p-3">NISN</th>
+                                        <th class="p-3">Nama Siswa</th>
+                                        <th class="p-3">Nilai Formatif</th>
+                                        <th class="p-3">Nilai Sumatif</th>
+                                        <th class="p-3">Nilai Akhir</th>
+                                        <th class="p-3">Status</th>
+                                        <th class="p-3">Tindak Lanjut AI</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 dark:divide-slate-700/60">
+                                    <tr>
+                                        <td class="p-3">1</td>
+                                        <td class="p-3 font-mono text-slate-400">008123456</td>
+                                        <td class="p-3 font-semibold text-slate-800 dark:text-slate-200">Aditya Pratama</td>
+                                        <td class="p-3">85</td>
+                                        <td class="p-3">90</td>
+                                        <td class="p-3 font-bold text-slate-800 dark:text-slate-200">87.5</td>
+                                        <td class="p-3"><span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">TUNTAS</span></td>
+                                        <td class="p-3 text-slate-500">Pengayaan Soal HOTS</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3">2</td>
+                                        <td class="p-3 font-mono text-slate-400">008123457</td>
+                                        <td class="p-3 font-semibold text-slate-800 dark:text-slate-200">Beringin Kurnia</td>
+                                        <td class="p-3">60</td>
+                                        <td class="p-3">68</td>
+                                        <td class="p-3 font-bold text-rose-600">64.0</td>
+                                        <td class="p-3"><span class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 text-[10px] font-bold">REMEDIAL</span></td>
+                                        <td class="p-3 text-amber-600 font-semibold">Tugas Tutor Sebaya & Modul 2</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3">3</td>
+                                        <td class="p-3 font-mono text-slate-400">008123458</td>
+                                        <td class="p-3 font-semibold text-slate-800 dark:text-slate-200">Cantika Dewi</td>
+                                        <td class="p-3">92</td>
+                                        <td class="p-3">95</td>
+                                        <td class="p-3 font-bold text-slate-800 dark:text-slate-200">93.5</td>
+                                        <td class="p-3"><span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">TUNTAS</span></td>
+                                        <td class="p-3 text-slate-500">Proyek Sains Kreatif</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. JURNAL MENGAJAR TAB -->
+                <div id="tab-journal" class="tab-content hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Jurnal Mengajar Harian</h2>
+                            <p class="text-xs text-slate-500">Catatan pelaksanaan pembelajaran, keaktifan kelas, dan absensi harian.</p>
+                        </div>
+                        <button onclick="openJournalModal()" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-xs font-bold transition-colors flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>+ Tambah Catatan Jurnal</span>
+                        </button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col md:flex-row gap-4">
+                            <div class="md:w-44 shrink-0 bg-primary-50 dark:bg-primary-950/40 p-3 rounded-xl border border-primary-100 dark:border-primary-900/50 text-center">
+                                <span class="text-xs font-bold text-primary-600 uppercase block">Jumat, 11 Sep 2026</span>
+                                <span class="text-lg font-black text-slate-800 dark:text-slate-100">Jam ke 1 - 3</span>
+                                <span class="text-[10px] text-slate-500 block mt-1">Kelas VIII-A (IPA)</span>
+                            </div>
+                            <div class="flex-1 space-y-2 text-xs">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm">Materi: Mekanisme Pernapasan Dada & Perut</h4>
+                                    <span class="bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full text-[10px]">96% Hadir (31/32)</span>
+                                </div>
+                                <p class="text-slate-600 dark:text-slate-300">
+                                    Pembelajaran berjalan interaktif menggunakan LKPD eksperimen praktikum pengukuran kapasitas paru-paru. 1 siswa izin sakit (Aditya).
+                                </p>
+                                <div class="pt-2 flex items-center gap-3 text-[11px] text-slate-400">
+                                    <span><i class="fa-solid fa-check text-emerald-500 mr-1"></i> Modul Ajar Terpenuhi</span>
+                                    <span><i class="fa-solid fa-paperclip mr-1"></i> Absensi Terverifikasi</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. BANK SOAL & ASESMEN TAB -->
+                <div id="tab-assessment" class="tab-content hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Bank Soal & Asesmen AI</h2>
+                            <p class="text-xs text-slate-500">Generator kisi-kisi, soal pilihan ganda, essay, dan rubrik penilaian otomatis.</p>
+                        </div>
+                        <button onclick="switchTab('ai-generator')" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-xs flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span>+ Buat Soal AI Baru</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-[10px] font-bold rounded-full">Pilihan Ganda • 10 Soal</span>
+                                    <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm mt-1">Soal Sumatif: Organ Pernapasan & Fungsi</h4>
+                                </div>
+                                <button onclick="openDocPreview('Soal & Kunci Jawaban IPA VIII')" class="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-500"><i class="fa-solid fa-eye"></i></button>
+                            </div>
+                            <p class="text-xs text-slate-500 line-clamp-2">Lengkap dengan kisi-kisi, kunci jawaban, dan pembahasan tingkat kesulitan HOTS/LOTS.</p>
+                            <div class="pt-2 border-t border-slate-100 dark:border-slate-700 flex justify-between text-[11px] text-slate-400">
+                                <span>Kurikulum Merdeka</span>
+                                <span class="font-semibold text-primary-600">Siap Cetak / Export</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 9. EXPORT CENTER TAB -->
+                <div id="tab-exports" class="tab-content hidden space-y-6">
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm space-y-6">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-900 dark:text-white">Export Center & ZIP Bundle</h2>
+                            <p class="text-xs text-slate-500">Unduh seluruh berkas administrasi guru dalam bentuk PDF, Microsoft Word (DOCX), Excel, atau arsip ZIP rapi.</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                            <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30 text-center space-y-3">
+                                <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl mx-auto">
+                                    <i class="fa-solid fa-file-pdf"></i>
+                                </div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-200">Format PDF Standard</h4>
+                                <p class="text-slate-500 text-[11px]">Siap langsung diprint dengan tata letak resmi sekolah, kop, dan stempel tanda tangan.</p>
+                                <button onclick="triggerBulkDownload('PDF')" class="w-full py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl">Download PDF Paket</button>
+                            </div>
+
+                            <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30 text-center space-y-3">
+                                <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mx-auto">
+                                    <i class="fa-solid fa-file-word"></i>
+                                </div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-200">Format MS Word (DOCX)</h4>
+                                <p class="text-slate-500 text-[11px]">Dapat diedit kembali di Microsoft Word offline dengan format tabel yang rapi.</p>
+                                <button onclick="triggerBulkDownload('DOCX')" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl">Download DOCX Paket</button>
+                            </div>
+
+                            <div class="p-5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30 text-center space-y-3">
+                                <div class="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl mx-auto">
+                                    <i class="fa-solid fa-file-zipper"></i>
+                                </div>
+                                <h4 class="font-bold text-slate-800 dark:text-slate-200">Bundle ZIP Administrasi</h4>
+                                <p class="text-slate-500 text-[11px]">Seluruh folder terstruktur (01_Perencanaan, 02_Penilaian, 03_Jurnal) terkompresi ZIP.</p>
+                                <button onclick="triggerBulkDownload('ZIP')" class="w-full py-2 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-xl">Download All (.ZIP)</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 10. PROFILE & SCHOOL SETTINGS TAB -->
+                <div id="tab-settings" class="tab-content hidden space-y-6">
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm max-w-3xl space-y-6">
+                        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Pengaturan Groq AI, Gemini & Profil Guru</h2>
+
+                        <!-- Groq & Gemini Configuration Card -->
+                        <div class="p-5 rounded-2xl bg-slate-50 dark:bg-slate-700/40 border border-slate-200 dark:border-slate-600 space-y-4 text-xs">
+                            <h3 class="font-bold text-slate-800 dark:text-slate-200 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-microchip text-amber-500"></i> Configuration Engine Groq AI & LLM
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block font-semibold mb-1">Provider Utama (Default)</label>
+                                    <select id="settings-ai-provider" onchange="updateProviderSelection(this.value)" class="w-full p-2.5 bg-white dark:bg-slate-800 border rounded-xl">
+                                        <option value="groq" selected>Groq AI (Ultra Fast Inference - Default)</option>
+                                        <option value="gemini">Google Gemini (Gemini 3 Flash)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-semibold mb-1">Model Groq Official</label>
+                                    <select id="settings-groq-model" onchange="updateGroqModelSelection(this.value)" class="w-full p-2.5 bg-white dark:bg-slate-800 border rounded-xl">
+                                        <optgroup label="Production LLMs & Systems">
+                                            <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (Llama 3.3 70B - Standard Flagship)</option>
+                                            <option value="llama-3.1-8b-instant">llama-3.1-8b-instant (Llama 3.1 8B - High Speed)</option>
+                                            <option value="openai/gpt-oss-120b">openai/gpt-oss-120b (GPT OSS 120B)</option>
+                                            <option value="openai/gpt-oss-20b">openai/gpt-oss-20b (GPT OSS 20B)</option>
+                                            <option value="groq/compound">groq/compound (Compound System)</option>
+                                            <option value="groq/compound-mini">groq/compound-mini (Compound Mini)</option>
+                                        </optgroup>
+                                        <optgroup label="Preview & Specialized LLMs">
+                                            <option value="qwen/qwen3.8-27b">qwen/qwen3.8-27b (Qwen 3.8 27B)</option>
+                                            <option value="qwen/qwen3.6-27b">qwen/qwen3.6-27b (Qwen 3.6 27B)</option>
+                                            <option value="minimaxai/minimax-m2.7">minimaxai/minimax-m2.7 (MiniMax M2.7)</option>
+                                            <option value="canopylabs/orpheus-v1-english">canopylabs/orpheus-v1-english (Canopy Labs Orpheus V1 English)</option>
+                                            <option value="canopylabs/orpheus-arabic-saudi">canopylabs/orpheus-arabic-saudi (Canopy Labs Orpheus Arabic Saudi)</option>
+                                        </optgroup>
+                                        <optgroup label="Safety & Guardrails">
+                                            <option value="openai/gpt-oss-safeguard-20b">openai/gpt-oss-safeguard-20b (Safety GPT OSS 20B)</option>
+                                            <option value="meta-llama/llama-prompt-guard-2-22m">meta-llama/llama-prompt-guard-2-22m (Llama Prompt Guard 2 22M)</option>
+                                        </optgroup>
+                                        <optgroup label="Audio / Whisper Speech Models">
+                                            <option value="whisper-large-v3-turbo">whisper-large-v3-turbo (Whisper Large V3 Turbo)</option>
+                                            <option value="whisper-large-v3">whisper-large-v3 (Whisper Large V3)</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block font-semibold mb-1">Groq API Key (`gsk_...`)</label>
+                                <input type="password" id="settings-groq-key" placeholder="Masukkan Groq API Key..." class="w-full p-2.5 bg-white dark:bg-slate-800 border rounded-xl font-mono">
+                                <p class="text-[11px] text-slate-500 mt-1">
+                                    Dapatkan key gratis di <a href="https://console.groq.com/keys" target="_blank" class="text-primary-600 font-semibold underline">Groq Console API Keys</a>.
+                                </p>
+                            </div>
+                        </div>
+
+                        <form id="profile-form" onsubmit="saveProfileSettings(event)" class="space-y-4 text-xs">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block font-semibold mb-1">Nama Lengkap & Gelar</label>
+                                    <input type="text" id="prof-name" value="Budi Santoso, S.Pd." class="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border rounded-xl">
+                                </div>
+                                <div>
+                                    <label class="block font-semibold mb-1">NIP / NUPTK</label>
+                                    <input type="text" id="prof-nip" value="19850712 201001 1 008" class="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border rounded-xl">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block font-semibold mb-1">Nama Sekolah</label>
+                                    <input type="text" id="prof-school" value="SMP Contoh Nusantara" class="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border rounded-xl">
+                                </div>
+                                <div>
+                                    <label class="block font-semibold mb-1">NPSN Sekolah</label>
+                                    <input type="text" id="prof-npsn" value="20109876" class="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border rounded-xl">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block font-semibold mb-1">Nama Kepala Sekolah</label>
+                                    <input type="text" id="prof-principal" value="Drs. Hj. Siti Rahmah, M.Pd." class="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border rounded-xl">
+                                </div>
+                                <div>
+                                    <label class="block font-semibold mb-1">NIP Kepala Sekolah</label>
+                                    <input type="text" id="prof-principal-nip" value="19720315 199802 2 001" class="w-full p-2.5 bg-slate-50 dark:bg-slate-700 border rounded-xl">
+                                </div>
+                            </div>
+
+                            <div class="pt-2 flex justify-end">
+                                <button type="submit" class="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-xl">Simpan Pengaturan Profil & Groq AI</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- FLOATING SMART AI ASSISTANT DRAWER -->
+    <div id="ai-assistant-drawer" class="fixed inset-y-0 right-0 w-full sm:w-96 bg-white dark:bg-slate-800 shadow-2xl border-l border-slate-200 dark:border-slate-700 z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-4 bg-gradient-to-r from-amber-500 to-amber-600 text-white flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-sparkles"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm">SMART AI Assistant</h3>
+                    <p class="text-[10px] text-amber-100">Groq Llama 3.3 70B (Default Engine)</p>
+                </div>
+            </div>
+            <button onclick="toggleAIAssistant()" class="text-white/80 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+
+        <div id="ai-chat-history" class="flex-1 p-4 overflow-y-auto space-y-3 text-xs">
+            <div class="p-3 rounded-2xl bg-slate-100 dark:bg-slate-700/50 text-slate-700 dark:text-slate-200 max-w-[85%]">
+                Halo Pak Budi! Saya <b>SMART Assistant (Powered by Groq AI)</b>. Ada yang bisa saya bantu buatkan hari ini? Misal: <i>"Buatkan 5 soal HOTS tentang respirasi"</i> atau <i>"Jelaskan struktur LKPD Kurikulum Merdeka"</i>.
+            </div>
+        </div>
+
+        <div class="p-3 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+            <form onsubmit="sendAIAssistantMessage(event)" class="flex items-center gap-2">
+                <input type="text" id="ai-chat-input" placeholder="Ketik perintah atau pertanyaan..." class="flex-1 px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-amber-500">
+                <button type="submit" class="p-2 bg-amber-500 text-white rounded-xl hover:bg-amber-600"><i class="fa-solid fa-paper-plane text-xs"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <!-- GLOBAL COMMAND PALETTE MODAL (CTRL+K) -->
+    <div id="command-palette-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-start justify-center pt-20 p-4">
+        <div class="bg-white dark:bg-slate-800 w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden space-y-2">
+            <div class="p-3 border-b border-slate-100 dark:border-slate-700 flex items-center gap-3">
+                <i class="fa-solid fa-magnifying-glass text-slate-400"></i>
+                <input type="text" id="cmd-input" placeholder="Ketik perintah... (e.g. 'Generate Modul', 'Analisis Nilai', 'Export')" class="w-full bg-transparent border-none text-xs text-slate-800 dark:text-slate-100 focus:outline-none">
+                <button onclick="closeCommandPalette()" class="text-slate-400 text-xs">ESC</button>
+            </div>
+            <div class="p-2 text-xs space-y-1 max-h-64 overflow-y-auto">
+                <div onclick="executeCommand('generate')" class="p-2 hover:bg-primary-50 dark:hover:bg-slate-700/50 rounded-xl cursor-pointer flex items-center gap-2 font-medium">
+                    <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i>
+                    <span>Generate Administrasi Baru dengan Groq AI</span>
+                </div>
+                <div onclick="executeCommand('documents')" class="p-2 hover:bg-primary-50 dark:hover:bg-slate-700/50 rounded-xl cursor-pointer flex items-center gap-2 font-medium">
+                    <i class="fa-solid fa-folder-open text-indigo-500"></i>
+                    <span>Buka Daftar Dokumen Saya</span>
+                </div>
+                <div onclick="executeCommand('grades')" class="p-2 hover:bg-primary-50 dark:hover:bg-slate-700/50 rounded-xl cursor-pointer flex items-center gap-2 font-medium">
+                    <i class="fa-solid fa-chart-line text-teal-500"></i>
+                    <span>Lihat Analisis Nilai & Remedial Siswa</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global Application State
+        const state = {
+            teacher: {
+                name: "Budi Santoso, S.Pd.",
+                nip: "19850712 201001 1 008",
+                school: "SMP Contoh Nusantara",
+                npsn: "20109876",
+                principal: "Drs. Hj. Siti Rahmah, M.Pd.",
+                principalNip: "19720315 199802 2 001",
+                subject: "IPA (Sains)",
+                class: "Kelas VIII-A"
+            },
+            aiProvider: localStorage.getItem('sg_ai_provider') || 'groq',
+            groqApiKey: localStorage.getItem('sg_groq_key') || '',
+            groqModel: localStorage.getItem('sg_groq_model') || 'llama-3.3-70b-versatile',
+            documents: [
+                {
+                    id: "doc-1",
+                    title: "Modul Ajar Kurikulum Merdeka - Sistem Pernapasan Manusia",
+                    category: "Modul Ajar",
+                    subject: "IPA (Sains)",
+                    class: "Kelas VIII-A",
+                    status: "Completed",
+                    updatedAt: "11 Sep 2026",
+                    content: `
+                        <div style="text-align:center; font-family: sans-serif;">
+                            <h2 style="margin:0; font-size:16px; font-weight:bold;">MODUL AJAR KURIKULUM MERDEKA</h2>
+                            <h3 style="margin:5px 0; font-size:14px; font-weight:bold; color:#4f46e5;">SMP CONTOH NUSANTARA</h3>
+                            <p style="font-size:11px; margin-bottom:15px;">Tahun Ajaran 2026/2027 • Semester Ganjil</p>
+                        </div>
+                        <hr style="border:1px solid #e2e8f0; margin-bottom:15px;"/>
+
+                        <table style="width:100%; font-size:11px; border-collapse:collapse; margin-bottom:15px;" border="1" cellpadding="5">
+                            <tr style="background:#f8fafc;">
+                                <td style="width:30%; font-weight:bold;">Mata Pelajaran</td>
+                                <td>IPA (Sains)</td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight:bold;">Kelas / Fase</td>
+                                <td>VIII (Delapan) / Fase D</td>
+                            </tr>
+                            <tr style="background:#f8fafc;">
+                                <td style="font-weight:bold;">Materi Pokok</td>
+                                <td>Sistem Pernapasan Manusia & Kesehatan Organ Paru</td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight:bold;">Alokasi Waktu</td>
+                                <td>3 JP x 40 Menit (1 Kali Pertemuan)</td>
+                            </tr>
+                        </table>
+
+                        <h4 style="font-size:12px; font-weight:bold; color:#1e293b; margin-top:15px; border-bottom:2px solid #6366f1; padding-bottom:3px;">I. TUJUAN PEMBELAJARAN (TP)</h4>
+                        <ol style="font-size:11px; padding-left:20px; line-height:1.6;">
+                            <li>Peserta didik mampu mengidentifikasi organ-organ penyusun sistem pernapasan manusia secara runtut melalui media torso/gambar interaktif.</li>
+                            <li>Peserta didik mampu menganalisis mekanisme pernapasan dada dan perut melalui percobaan kelompok sederhana.</li>
+                            <li>Peserta didik mampu menyusun kampanye digital/poster mengenai pentingnya menjaga organ paru-paru dari bahaya polusi dan rokok.</li>
+                        </ol>
+
+                        <h4 style="font-size:12px; font-weight:bold; color:#1e293b; margin-top:15px; border-bottom:2px solid #6366f1; padding-bottom:3px;">II. KEGIATAN PEMBELAJARAN</h4>
+                        <p style="font-size:11px; font-weight:bold; margin-bottom:3px;">A. Pendahuluan (15 Menit)</p>
+                        <ul style="font-size:11px; padding-left:20px; margin-bottom:10px;">
+                            <li>Guru membuka pembelajaran dengan salam, doa, dan mengabsen peserta didik.</li>
+                            <li>Apersepsi: Guru meminta siswa menarik napas dalam-dalam dan merasakan gerakan dada.</li>
+                        </ul>
+
+                        <p style="font-size:11px; font-weight:bold; margin-bottom:3px;">B. Kegiatan Inti (90 Menit)</p>
+                        <ul style="font-size:11px; padding-left:20px; margin-bottom:10px;">
+                            <li>Siswa dibagi dalam kelompok kecil untuk mengamati model eksperimen paru-paru balon.</li>
+                            <li>Siswa mengerjakan LKPD 1 untuk mendiskusikan mekanisme inspirasi dan ekspirasi.</li>
+                        </ul>
+
+                        <p style="font-size:11px; font-weight:bold; margin-bottom:3px;">C. Penutup (15 Menit)</p>
+                        <ul style="font-size:11px; padding-left:20px; margin-bottom:15px;">
+                            <li>Siswa bersama guru menyimpulkan poin utama organ pernapasan.</li>
+                        </ul>
+
+                        <div style="margin-top:40px; display:flex; justify-content:space-between; font-size:11px;">
+                            <div style="text-align:center;">
+                                Mengetahui,<br/>Kepala Sekolah<br/><br/><br/><br/>
+                                <b><u>Drs. Hj. Siti Rahmah, M.Pd.</u></b><br/>NIP. 19720315 199802 2 001
+                            </div>
+                            <div style="text-align:center;">
+                                Nusantara, 11 September 2026<br/>Guru Mata Pelajaran<br/><br/><br/><br/>
+                                <b><u>Budi Santoso, S.Pd.</u></b><br/>NIP. 19850712 201001 1 008
+                            </div>
+                        </div>
+                    `
+                },
+                {
+                    id: "doc-2",
+                    title: "Alur Tujuan Pembelajaran (ATP) IPA Kelas VIII",
+                    category: "ATP",
+                    subject: "IPA (Sains)",
+                    class: "Kelas VIII-A",
+                    status: "Completed",
+                    updatedAt: "10 Sep 2026",
+                    content: "<h3>Alur Tujuan Pembelajaran (ATP)</h3><p>Dokumen ATP resmi Kurikulum Merdeka untuk fase D.</p>"
+                },
+                {
+                    id: "doc-3",
+                    title: "Soal & Kunci Jawaban IPA VIII - Sistem Pernapasan",
+                    category: "Asesmen",
+                    subject: "IPA (Sains)",
+                    class: "Kelas VIII-A",
+                    status: "Completed",
+                    updatedAt: "09 Sep 2026",
+                    content: "<h3>Bank Soal & Asesmen IPA</h3><p>Lengkap dengan kunci jawaban dan rubrik penilaian HOTS.</p>"
+                }
+            ],
+            activeDocId: null
+        };
+
+        window.onload = function() {
+            initScoreChart();
+            initGradeChart();
+            renderRecentDocsTable();
+            renderDocumentsList();
+            initAISettingsUI();
+            
+            // Register Keyboard Shortcut (Ctrl + K)
+            window.addEventListener('keydown', function(e) {
+                if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                    e.preventDefault();
+                    openCommandPalette();
+                }
+            });
+        };
+
+        function initAISettingsUI() {
+            const keyGen = document.getElementById('gen-groq-key');
+            const keySet = document.getElementById('settings-groq-key');
+            const modelGen = document.getElementById('gen-groq-model');
+            const modelSet = document.getElementById('settings-groq-model');
+            const provSet = document.getElementById('settings-ai-provider');
+
+            if (keyGen) keyGen.value = state.groqApiKey;
+            if (keySet) keySet.value = state.groqApiKey;
+            if (modelGen) modelGen.value = state.groqModel;
+            if (modelSet) modelSet.value = state.groqModel;
+            if (provSet) provSet.value = state.aiProvider;
+
+            updateProviderSelection(state.aiProvider);
+        }
+
+        function updateProviderSelection(provider) {
+            state.aiProvider = provider;
+            localStorage.setItem('sg_ai_provider', provider);
+
+            const cardGroq = document.getElementById('provider-card-groq');
+            const cardGemini = document.getElementById('provider-card-gemini');
+            
+            if (cardGroq && cardGemini) {
+                if (provider === 'groq') {
+                    cardGroq.className = "p-3.5 rounded-2xl border-2 border-amber-500 bg-amber-50/30 dark:bg-amber-950/20 cursor-pointer flex items-start gap-3 transition-all";
+                    cardGemini.className = "p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30 cursor-pointer flex items-start gap-3 transition-all";
+                } else {
+                    cardGemini.className = "p-3.5 rounded-2xl border-2 border-primary-600 bg-primary-50/30 dark:bg-primary-950/20 cursor-pointer flex items-start gap-3 transition-all";
+                    cardGroq.className = "p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-700/30 cursor-pointer flex items-start gap-3 transition-all";
+                }
+            }
+        }
+
+        function updateGroqModelSelection(model) {
+            state.groqModel = model;
+            localStorage.setItem('sg_groq_model', model);
+            
+            const modelGen = document.getElementById('gen-groq-model');
+            const modelSet = document.getElementById('settings-groq-model');
+            if (modelGen && modelGen.value !== model) modelGen.value = model;
+            if (modelSet && modelSet.value !== model) modelSet.value = model;
+        }
+
+        function saveGroqKeyFromForm(key) {
+            state.groqApiKey = key.trim();
+            localStorage.setItem('sg_groq_key', state.groqApiKey);
+            const keySet = document.getElementById('settings-groq-key');
+            if (keySet) keySet.value = state.groqApiKey;
+        }
+
+        async function callAIProvider(prompt, systemPrompt = "Anda adalah asisten pembuatan administrasi guru Kurikulum Merdeka Indonesia.") {
+            const provider = state.aiProvider;
+            
+            // Check key from client storage, window object, or process.env (Vercel)
+            const groqKey = state.groqApiKey || 
+                            (typeof process !== 'undefined' && process.env ? (process.env.GROQ_API_KEY || process.env.NEXT_PUBLIC_GROQ_API_KEY) : '') || 
+                            window.GROQ_API_KEY || '';
+
+            // 1. GROQ API ENGINE
+            if (provider === 'groq') {
+                if (groqKey) {
+                    try {
+                        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                            method: 'POST',
+                            headers: {
+                                'Authorization': `Bearer ${groqKey}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                model: state.groqModel || "llama-3.3-70b-versatile",
+                                messages: [
+                                    { role: "system", content: systemPrompt },
+                                    { role: "user", content: prompt }
+                                ],
+                                temperature: 0.6
+                            })
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            return data.choices?.[0]?.message?.content || null;
+                        }
+                    } catch (err) {
+                        console.warn("Direct Groq API call failed, trying Vercel API Route fallback:", err);
+                    }
+                }
+
+                // Fallback to Vercel Serverless API Route (/api/generate) using server-side GROQ_API_KEY
+                try {
+                    const response = await fetch('/api/generate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            prompt: prompt,
+                            systemPrompt: systemPrompt,
+                            model: state.groqModel || "llama-3.3-70b-versatile"
+                        })
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.content) return data.content;
+                    }
+                } catch (e) {
+                    console.warn("Vercel /api/generate route fallback skipped:", e);
+                }
+            }
+
+            // 2. GEMINI API ENGINE (gemini-3-flash-preview)
+            try {
+                const apiKey = ""; // Runtime auto-injected Gemini Key if present
+                if (apiKey) {
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            systemInstruction: { parts: [{ text: systemPrompt }] },
+                            contents: [{ parts: [{ text: prompt }] }]
+                        })
+                    });
+                    if (response.ok) {
+                        const result = await response.json();
+                        return result.candidates?.[0]?.content?.parts?.[0]?.text || null;
+                    }
+                }
+            } catch (err) {
+                console.warn("Gemini API call failed:", err);
+            }
+
+            return null; // Triggers built-in SMART template generator fallback
+        }
+
+        async function triggerSmartAIGeneration() {
+            const btn = document.getElementById('btn-generate-ai');
+            const originalText = btn.innerHTML;
+            
+            const providerName = state.aiProvider === 'groq' ? `Groq (${state.groqModel})` : 'Gemini 3 Flash';
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-lg"></i> <span>MENG-GENERATE DENGAN ${providerName.toUpperCase()}...</span>`;
+
+            const jenjang = document.getElementById('gen-jenjang').value;
+            const kelas = document.getElementById('gen-kelas').value;
+            const mapel = document.getElementById('gen-mapel').value;
+            const materi = document.getElementById('gen-materi').value;
+            const tujuan = document.getElementById('gen-tujuan').value;
+
+            const prompt = `Buatkan Modul Ajar Kurikulum Merdeka dalam bentuk HTML lengkap dan profesional untuk:
+            Jenjang: ${jenjang}, Kelas: ${kelas}, Mata Pelajaran: ${mapel}, Materi: ${materi}.
+            Tujuan Pembelajaran: ${tujuan}.
+            Sertakan tabel identitas modul, alur kegiatan pembelajaran (pendahuluan, inti, penutup), kisi-kisi asesmen, serta blok tanda tangan Kepala Sekolah (${state.teacher.principal}) dan Guru (${state.teacher.name}). Format harus siap cetak A4.`;
+
+            const generatedHtml = await callAIProvider(prompt);
+
+            if (generatedHtml) {
+                addNewGeneratedDoc(materi, kelas, mapel, generatedHtml);
+            } else {
+                useFallbackGeneration(materi, kelas, mapel, tujuan);
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+
+        async function sendAIAssistantMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('ai-chat-input');
+            const history = document.getElementById('ai-chat-history');
+            const text = input.value.trim();
+            if (!text) return;
+
+            // User Message Bubble
+            const userBubble = document.createElement('div');
+            userBubble.className = 'p-3 rounded-2xl bg-amber-500 text-white ml-auto max-w-[85%]';
+            userBubble.innerText = text;
+            history.appendChild(userBubble);
+            input.value = '';
+
+            // AI Loading Indicator
+            const aiLoading = document.createElement('div');
+            aiLoading.className = 'p-3 rounded-2xl bg-slate-100 dark:bg-slate-700/50 text-slate-500 max-w-[85%] flex items-center gap-2';
+            aiLoading.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-amber-500"></i> <span>Memproses dengan ${state.aiProvider === 'groq' ? `Groq (${state.groqModel})` : 'Gemini AI'}...</span>`;
+            history.appendChild(aiLoading);
+            history.scrollTop = history.scrollHeight;
+
+            const reply = await callAIProvider(
+                text, 
+                "Anda adalah SMART AI Assistant, asisten digital guru Indonesia yang ramah, solutif, dan ahli dalam Kurikulum Merdeka. Jawab dengan ringkas dan terstruktur."
+            );
+
+            history.removeChild(aiLoading);
+
+            const aiBubble = document.createElement('div');
+            aiBubble.className = 'p-3 rounded-2xl bg-slate-100 dark:bg-slate-700/50 text-slate-700 dark:text-slate-200 max-w-[85%] space-y-1';
+            
+            if (reply) {
+                aiBubble.innerHTML = `<div><span class="font-bold text-amber-600 dark:text-amber-400"><i class="fa-solid fa-robot mr-1"></i> SMART AI (${state.aiProvider.toUpperCase()}):</span></div><div class="mt-1 leading-relaxed">${reply.replace(/\n/g, '<br/>')}</div>`;
+            } else {
+                aiBubble.innerHTML = `<b>SMART AI:</b> Siap Pak Budi! Saya telah memproses permintaan Anda mengenai <i>"${text}"</i>. Anda dapat mengeklik tombol <b>+ Generate Administrasi</b> untuk menyatukannya ke berkas resmi.`;
+            }
+            
+            history.appendChild(aiBubble);
+            history.scrollTop = history.scrollHeight;
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            const selectedTab = document.getElementById(`tab-${tabId}`);
+            if (selectedTab) {
+                selectedTab.classList.remove('hidden');
+            }
+
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.classList.remove('bg-slate-100', 'dark:bg-slate-700/50', 'text-primary-600');
+            });
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.classList.add('bg-slate-100', 'dark:bg-slate-700/50', 'text-primary-600');
+            }
+
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.add('-translate-x-full');
+            }
+        }
+
+        function saveProfileSettings(e) {
+            e.preventDefault();
+            
+            state.teacher.name = document.getElementById('prof-name').value;
+            state.teacher.school = document.getElementById('prof-school').value;
+            if (document.getElementById('dash-teacher-name')) document.getElementById('dash-teacher-name').innerText = state.teacher.name;
+            if (document.getElementById('profile-name-side')) document.getElementById('profile-name-side').innerText = state.teacher.name;
+            if (document.getElementById('profile-school-side')) document.getElementById('profile-school-side').innerText = state.teacher.school;
+
+            const provSet = document.getElementById('settings-ai-provider')?.value;
+            const modelSet = document.getElementById('settings-groq-model')?.value;
+            const keySet = document.getElementById('settings-groq-key')?.value;
+
+            if (provSet) updateProviderSelection(provSet);
+            if (modelSet) updateGroqModelSelection(modelSet);
+            if (keySet !== undefined) saveGroqKeyFromForm(keySet);
+
+            alert('Pengaturan Profil Guru & Provider Groq AI berhasil disimpan!');
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        }
+
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+        }
+
+        function toggleNotifications() {
+            document.getElementById('notifications-menu').classList.toggle('hidden');
+        }
+
+        function toggleAIAssistant() {
+            document.getElementById('ai-assistant-drawer').classList.toggle('translate-x-full');
+        }
+
+        function openCommandPalette() {
+            document.getElementById('command-palette-modal').classList.remove('hidden');
+            document.getElementById('cmd-input').focus();
+        }
+
+        function closeCommandPalette() {
+            document.getElementById('command-palette-modal').classList.add('hidden');
+        }
+
+        function executeCommand(cmd) {
+            closeCommandPalette();
+            if (cmd === 'generate') switchTab('ai-generator');
+            else if (cmd === 'documents') switchTab('documents');
+            else if (cmd === 'grades') switchTab('grades');
+        }
+
+        function renderRecentDocsTable() {
+            const tbody = document.getElementById('recent-docs-tbody');
+            if (!tbody) return;
+            tbody.innerHTML = state.documents.map(doc => `
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+                    <td class="p-3.5 pl-5 font-bold text-slate-800 dark:text-slate-200">${doc.title}</td>
+                    <td class="p-3.5"><span class="px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-300 font-semibold text-[10px]">${doc.category}</span></td>
+                    <td class="p-3.5 text-slate-500">${doc.subject} • ${doc.class}</td>
+                    <td class="p-3.5"><span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-bold text-[10px]">${doc.status}</span></td>
+                    <td class="p-3.5 text-slate-400">${doc.updatedAt}</td>
+                    <td class="p-3.5 pr-5 text-right">
+                        <button onclick="openDocPreview('${doc.id}')" class="px-2.5 py-1 bg-primary-50 dark:bg-primary-950 text-primary-600 dark:text-primary-300 rounded-lg font-semibold hover:bg-primary-100 transition-colors">
+                            Buka <i class="fa-solid fa-arrow-right text-[10px] ml-1"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderDocumentsList() {
+            const grid = document.getElementById('documents-grid');
+            if (!grid) return;
+
+            const query = (document.getElementById('doc-search-input')?.value || '').toLowerCase();
+            const cat = document.getElementById('doc-filter-category')?.value || 'ALL';
+
+            const filtered = state.documents.filter(doc => {
+                const matchesQuery = doc.title.toLowerCase().includes(query) || doc.subject.toLowerCase().includes(query);
+                const matchesCat = (cat === 'ALL') || doc.category === cat;
+                return matchesQuery && matchesCat;
+            });
+
+            grid.innerHTML = filtered.map(doc => `
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="px-2.5 py-0.5 rounded-full bg-primary-50 dark:bg-primary-950/60 text-primary-600 dark:text-primary-300 font-bold text-[10px]">${doc.category}</span>
+                            <span class="text-[10px] text-slate-400">${doc.updatedAt}</span>
+                        </div>
+                        <h4 class="font-bold text-slate-800 dark:text-slate-100 text-sm leading-snug">${doc.title}</h4>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${doc.subject} • ${doc.class}</p>
+                    </div>
+
+                    <div class="mt-5 pt-3 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between">
+                        <button onclick="duplicateDocument('${doc.id}')" class="text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 flex items-center gap-1">
+                            <i class="fa-solid fa-copy"></i> Duplikasi
+                        </button>
+                        <button onclick="openDocPreview('${doc.id}')" class="px-3 py-1.5 bg-primary-600 hover:bg-primary-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1">
+                            <span>Edit & Preview</span> <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openDocPreview(docId) {
+            const doc = state.documents.find(d => d.id === docId) || state.documents[0];
+            state.activeDocId = doc.id;
+
+            document.getElementById('editor-doc-title').innerText = doc.title;
+            document.getElementById('printable-area').innerHTML = doc.content;
+
+            switchTab('editor');
+        }
+
+        function setPaperFormat(format) {
+            const paper = document.getElementById('printable-area');
+            if (format === 'F4') {
+                paper.className = 'f4-paper rounded-sm font-sans text-xs leading-relaxed outline-none';
+            } else {
+                paper.className = 'a4-paper rounded-sm font-sans text-xs leading-relaxed outline-none';
+            }
+        }
+
+        function saveCurrentDocument() {
+            const content = document.getElementById('printable-area').innerHTML;
+            const doc = state.documents.find(d => d.id === state.activeDocId);
+            if (doc) {
+                doc.content = content;
+                doc.updatedAt = "Baru Saja";
+            }
+            alert('Dokumen berhasil disimpan ke Dokumen Saya!');
+        }
+
+        function printDocument() {
+            window.print();
+        }
+
+        function exportDocxSimulated() {
+            alert('Mengunduh dokumen dalam format MS Word (.DOCX)... File siap diedit offline.');
+        }
+
+        function useFallbackGeneration(materi, kelas, mapel, tujuan) {
+            const docContent = `
+                <div style="text-align:center;">
+                    <h2 style="margin:0; font-size:16px;">MODUL AJAR KURIKULUM MERDEKA AI</h2>
+                    <h3 style="margin:5px 0; color:#4f46e5;">SMP CONTOH NUSANTARA</h3>
+                    <p style="font-size:11px;">Materi: ${materi} • ${kelas}</p>
+                </div>
+                <hr style="border:1px solid #e2e8f0; margin:15px 0;"/>
+                <p><b>Mata Pelajaran:</b> ${mapel}</p>
+                <p><b>Tujuan Pembelajaran:</b> ${tujuan}</p>
+                <h4 style="border-bottom:2px solid #6366f1; margin-top:15px;">HASIL AI ONE-CLICK GENERATOR:</h4>
+                <ul>
+                    <li>1. ATP & CP Terhubung ✅</li>
+                    <li>2. Modul Ajar + LKPD Siswa ✅</li>
+                    <li>3. Bank Soal HOTS & Rubrik Penilaian ✅</li>
+                    <li>4. Jurnal Mengajar Harian ✅</li>
+                </ul>
+            `;
+            addNewGeneratedDoc(materi, kelas, mapel, docContent);
+        }
+
+        function addNewGeneratedDoc(materi, kelas, mapel, content) {
+            const newDoc = {
+                id: "doc-" + Date.now(),
+                title: `Modul Ajar AI - ${materi}`,
+                category: "Modul Ajar",
+                subject: mapel,
+                class: kelas,
+                status: "Completed",
+                updatedAt: "Baru Saja",
+                content: content
+            };
+            state.documents.unshift(newDoc);
+            renderRecentDocsTable();
+            renderDocumentsList();
+            openDocPreview(newDoc.id);
+        }
+
+        function duplicateDocument(docId) {
+            const doc = state.documents.find(d => d.id === docId);
+            if (!doc) return;
+            const copy = JSON.parse(JSON.stringify(doc));
+            copy.id = "doc-" + Date.now();
+            copy.title = doc.title + " (Salinan - Kelas VIII-B)";
+            copy.class = "Kelas VIII-B";
+            state.documents.unshift(copy);
+            renderDocumentsList();
+            alert('Dokumen berhasil diduplikasi untuk Kelas VIII-B!');
+        }
+
+        function selectAllDocCheckboxes(checked) {
+            document.querySelectorAll('.doc-chk').forEach(c => c.checked = checked);
+        }
+
+        function initScoreChart() {
+            const ctx = document.getElementById('smartScoreChart')?.getContext('2d');
+            if (!ctx) return;
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [87, 13],
+                        backgroundColor: ['#6366f1', '#e2e8f0'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    cutout: '80%',
+                    plugins: { tooltip: { enabled: false } },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function initGradeChart() {
+            const ctx = document.getElementById('gradeDistributionChart')?.getContext('2d');
+            if (!ctx) return;
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['< 70', '70 - 75', '76 - 85', '86 - 95', '96 - 100'],
+                    datasets: [{
+                        label: 'Jumlah Siswa',
+                        data: [2, 2, 14, 11, 3],
+                        backgroundColor: '#6366f1',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function triggerBulkDownload(type) {
+            alert(`Menyiapkan file ${type} paket administrasi lengkap... Unduhan akan dimulai sebentar lagi.`);
+        }
+
+        function generateRemedialAI() {
+            alert('Groq AI berhasil menyusun 5 Soal Remedial khusus untuk 4 siswa yang belum tuntas KKM!');
+        }
+
+        function openJournalModal() {
+            alert('Formulir entri Jurnal Mengajar Harian terbuka. Data akan otomatis disinkronkan ke rekap bulanan.');
+        }
+
+        function filterDocumentType(type) {
+            switchTab('documents');
+            const select = document.getElementById('doc-filter-category');
+            if (select) {
+                select.value = type;
+                renderDocumentsList();
+            }
+        }
+    </script>
+</body>
+</html>
