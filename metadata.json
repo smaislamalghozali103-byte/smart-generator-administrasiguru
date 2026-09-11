@@ -1,0 +1,8 @@
+{
+  "name": "Smart Generator Administrasi Guru",
+  "description": "Aplikasi penghasil administrasi guru terintegrasi Kurikulum Merdeka dengan AI",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

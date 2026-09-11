@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SMART GENERATOR - Semua Administrasi Guru, Lebih Smart.</title>
+    <meta name="description" content="Aplikasi penghasil administrasi guru terintegrasi Kurikulum Merdeka dengan AI">
+    <meta property="og:title" content="Smart Generator Administrasi Guru">
+    <meta property="og:description" content="Aplikasi penghasil administrasi guru terintegrasi Kurikulum Merdeka dengan AI">
     
     <!-- External Dependencies & Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -1353,82 +1356,55 @@
         }
 
         async function callAIProvider(prompt, systemPrompt = "Anda adalah asisten pembuatan administrasi guru Kurikulum Merdeka Indonesia.") {
-            const provider = state.aiProvider;
-            
-            // Check key from client storage, window object, or process.env (Vercel)
-            const groqKey = state.groqApiKey || 
-                            (typeof process !== 'undefined' && process.env ? (process.env.GROQ_API_KEY || process.env.NEXT_PUBLIC_GROQ_API_KEY) : '') || 
-                            window.GROQ_API_KEY || '';
+            const provider = state.aiProvider || 'groq';
+            const groqKey = state.groqApiKey || '';
 
-            // 1. GROQ API ENGINE
-            if (provider === 'groq') {
-                if (groqKey) {
-                    try {
-                        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': `Bearer ${groqKey}`,
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                model: state.groqModel || "llama-3.3-70b-versatile",
-                                messages: [
-                                    { role: "system", content: systemPrompt },
-                                    { role: "user", content: prompt }
-                                ],
-                                temperature: 0.6
-                            })
-                        });
-                        
-                        if (response.ok) {
-                            const data = await response.json();
-                            return data.choices?.[0]?.message?.content || null;
-                        }
-                    } catch (err) {
-                        console.warn("Direct Groq API call failed, trying Vercel API Route fallback:", err);
-                    }
+            // Call server-side API proxy (/api/generate)
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        systemPrompt: systemPrompt,
+                        provider: provider,
+                        model: state.groqModel || "llama-3.3-70b-versatile",
+                        apiKey: groqKey
+                    })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.content) return data.content;
                 }
+            } catch (e) {
+                console.warn("Backend /api/generate route error:", e);
+            }
 
-                // Fallback to Vercel Serverless API Route (/api/generate) using server-side GROQ_API_KEY
+            // Direct Groq fallback if user entered a key in the browser
+            if (provider === 'groq' && groqKey) {
                 try {
-                    const response = await fetch('/api/generate', {
+                    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Authorization': `Bearer ${groqKey}`,
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify({
-                            prompt: prompt,
-                            systemPrompt: systemPrompt,
-                            model: state.groqModel || "llama-3.3-70b-versatile"
+                            model: state.groqModel || "llama-3.3-70b-versatile",
+                            messages: [
+                                { role: "system", content: systemPrompt },
+                                { role: "user", content: prompt }
+                            ],
+                            temperature: 0.6
                         })
                     });
                     if (response.ok) {
                         const data = await response.json();
-                        if (data.content) return data.content;
+                        return data.choices?.[0]?.message?.content || null;
                     }
-                } catch (e) {
-                    console.warn("Vercel /api/generate route fallback skipped:", e);
+                } catch (err) {
+                    console.warn("Direct Groq API call failed:", err);
                 }
-            }
-
-            // 2. GEMINI API ENGINE (gemini-3-flash-preview)
-            try {
-                const apiKey = ""; // Runtime auto-injected Gemini Key if present
-                if (apiKey) {
-                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            systemInstruction: { parts: [{ text: systemPrompt }] },
-                            contents: [{ parts: [{ text: prompt }] }]
-                        })
-                    });
-                    if (response.ok) {
-                        const result = await response.json();
-                        return result.candidates?.[0]?.content?.parts?.[0]?.text || null;
-                    }
-                }
-            } catch (err) {
-                console.warn("Gemini API call failed:", err);
             }
 
             return null; // Triggers built-in SMART template generator fallback
